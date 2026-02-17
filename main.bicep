@@ -15,7 +15,9 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
 
 resource fileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01' = {
   name: '${storageAccount.name}/default/${fileShareName}'
-  properties: { shareQuota: 5 }
+  properties: {
+    shareQuota: 5
+  }
 }
 
 var storageKey = storageAccount.listKeys().keys[0].value
@@ -25,9 +27,17 @@ var storageKey = storageAccount.listKeys().keys[0].value
 resource containerEnv 'Microsoft.App/managedEnvironments@2023-05-01' = {
   name: '${containerAppName}-env'
   location: location
+  properties: {
+    workloadProfiles: [
+      {
+        name: 'Consumption'
+        workloadProfileType: 'Consumption'
+      }
+    ]
+  }
 }
 
-/* ---------- ENV STORAGE (FILE SHARE) ---------- */
+/* ---------- ENV STORAGE ---------- */
 
 resource envStorage 'Microsoft.App/managedEnvironments/storages@2023-05-01' = {
   name: 'csvstorage'
@@ -85,3 +95,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
     }
   }
 }
+
+/* ---------- OUTPUT ---------- */
+
+output appUrl string = containerApp.properties.configuration.ingress.fqdn

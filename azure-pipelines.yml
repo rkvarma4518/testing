@@ -1,0 +1,32 @@
+trigger: none
+pr: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+
+- task: Docker@2
+  displayName: 'Build and Push Docker Hub Image'
+  inputs:
+    command: buildAndPush
+    containerRegistry: 'dockerhub'
+    repository: 'rkvarma4518/myflaskcsvapp'
+    dockerfile: '**/Dockerfile'
+    tags: |
+      latest
+
+# Deploy Bicep using Azure CLI
+- task: AzureCLI@2
+  displayName: 'Deploy Bicep file'
+  inputs:
+    azureSubscription: 'az-resource-manager'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      az deployment group create \
+        --resource-group azure-devops \
+        --template-file main.bicep \
+        --debug \
+        --verbose
+    workingDirectory: $(System.DefaultWorkingDirectory)

@@ -2,7 +2,11 @@ param location string = resourceGroup().location
 param storageAccountName string = 'flaskfilestore'
 param containerAppName string = 'flask-csv-app'
 param fileShareName string = 'csvshare'
-param imageName string = 'rkvarma4518/myflaskcsvapp:latest'
+param imageRepository string = 'rkvarma4518/myflaskcsvapp'
+param imageTag string
+
+var imageName = '${imageRepository}:${imageTag}'
+
 
 /* ---------- STORAGE ---------- */
 
@@ -97,7 +101,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
           name: 'flask'
           image: imageName
           resources: {
-            cpu: 0.5
+            cpu: json('0.5')
             memory: '1Gi'
           }
           volumeMounts: [

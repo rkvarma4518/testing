@@ -1,5 +1,5 @@
 param location string = resourceGroup().location
-param storageAccountName string
+param storageAccountName string = 'storage-test'
 param containerAppName string = 'flask-csv-app'
 param fileShareName string = 'csvshare'
 param imageName string = 'rkvarma4518/myflaskcsvapp:latest'

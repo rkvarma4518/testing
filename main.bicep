@@ -57,6 +57,9 @@ resource envStorage 'Microsoft.App/managedEnvironments/storages@2023-05-01' = {
 resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
   name: containerAppName
   location: location
+  dependsOn: [
+    envStorage
+  ]
   properties: {
     environmentId: containerEnv.id
 

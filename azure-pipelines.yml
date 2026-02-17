@@ -14,7 +14,7 @@ steps:
     repository: 'rkvarma4518/myflaskcsvapp'
     dockerfile: '**/Dockerfile'
     tags: |
-      latest
+      "$(Build.BuildId)"
 
 # Deploy Bicep using Azure CLI
 - task: AzureCLI@2
@@ -28,5 +28,6 @@ steps:
         --resource-group azure-devops \
         --template-file main.bicep \
         --debug \
-        --verbose
+        --verbose \
+        --parameters imageTag="$(Build.BuildId)"
     workingDirectory: $(System.DefaultWorkingDirectory)

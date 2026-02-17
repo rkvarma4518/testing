@@ -1,14 +1,13 @@
 param location string = resourceGroup().location
 param storageAccountName string = 'flaskfilestore'
 param containerAppName string = 'flask-csv-app'
-param fileShareName string = 'csvshare'
+param blobContainerName string = 'csvcontainer'
 param imageRepository string = 'rkvarma4518/myflaskcsvapp'
 param imageTag string
 
 var imageName = '${imageRepository}:${imageTag}'
 
-
-/* ---------- STORAGE ---------- */
+/* ---------- STORAGE ACCOUNT ---------- */
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   name: storageAccountName
@@ -17,10 +16,16 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   kind: 'StorageV2'
 }
 
-resource fileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01' = {
-  name: '${storageAccount.name}/default/${fileShareName}'
+/* ---------- BLOB CONTAINER ---------- */
+
+resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-01-01' = {
+  name: '${storageAccount.name}/default'
+}
+
+resource blobContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-01-01' = {
+  name: '${storageAccount.name}/default/${blobContainerName}'
   properties: {
-    shareQuota: 5
+    publicAccess: 'None'
   }
 }
 
@@ -39,7 +44,6 @@ resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
   }
 }
 
-
 /* ---------- CONTAINER APP ENV ---------- */
 
 resource containerEnv 'Microsoft.App/managedEnvironments@2023-05-01' = {
@@ -52,7 +56,6 @@ resource containerEnv 'Microsoft.App/managedEnvironments@2023-05-01' = {
         workloadProfileType: 'Consumption'
       }
     ]
-
     appLogsConfiguration: {
       destination: 'log-analytics'
       logAnalyticsConfiguration: {
@@ -63,16 +66,16 @@ resource containerEnv 'Microsoft.App/managedEnvironments@2023-05-01' = {
   }
 }
 
-/* ---------- ENV STORAGE ---------- */
+/* ---------- ENV STORAGE (BLOB) ---------- */
 
 resource envStorage 'Microsoft.App/managedEnvironments/storages@2023-05-01' = {
   name: 'csvstorage'
   parent: containerEnv
   properties: {
-    azureFile: {
+    azureBlob: {
       accountName: storageAccount.name
       accountKey: storageKey
-      shareName: fileShareName
+      containerName: blobContainerName
       accessMode: 'ReadWrite'
     }
   }
@@ -117,7 +120,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
       volumes: [
         {
           name: 'files'
-          storageType: 'AzureFile'
+          storageType: 'AzureBlob'
           storageName: 'csvstorage'
         }
       ]

@@ -16,8 +16,9 @@ def read_csv():
     with open(CSV_PATH, newline='') as csvfile:
         reader = csv.DictReader(csvfile)
 
-        # for row in reader:
-        #     rows.append(row)
+        for row in reader:
+            rows.append(row)
+            break
 
     return jsonify(rows)
 
@@ -42,4 +43,5 @@ def home():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
+
 

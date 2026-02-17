@@ -28,8 +28,8 @@ var storageKey = storageAccount.listKeys().keys[0].value
 
 /* ---------- LOG ANALYTICS ---------- */
 
-resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2023-04-01' = {
-  name: '${containerAppName}-logs'
+resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
+  name: 'law-xyz'
   location: location
   properties: {
     sku: {
@@ -38,6 +38,7 @@ resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2023-04-01' = {
     retentionInDays: 30
   }
 }
+
 
 /* ---------- CONTAINER APP ENV ---------- */
 

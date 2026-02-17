@@ -22,6 +22,19 @@ resource fileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-0
 
 var storageKey = storageAccount.listKeys().keys[0].value
 
+/* ---------- LOG ANALYTICS ---------- */
+
+resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2023-04-01' = {
+  name: '${containerAppName}-logs'
+  location: location
+  properties: {
+    sku: {
+      name: 'PerGB2018'
+    }
+    retentionInDays: 30
+  }
+}
+
 /* ---------- CONTAINER APP ENV ---------- */
 
 resource containerEnv 'Microsoft.App/managedEnvironments@2023-05-01' = {
@@ -34,6 +47,14 @@ resource containerEnv 'Microsoft.App/managedEnvironments@2023-05-01' = {
         workloadProfileType: 'Consumption'
       }
     ]
+
+    appLogsConfiguration: {
+      destination: 'log-analytics'
+      logAnalyticsConfiguration: {
+        customerId: logAnalytics.properties.customerId
+        sharedKey: logAnalytics.listKeys().primarySharedKey
+      }
+    }
   }
 }
 
@@ -76,7 +97,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
           name: 'flask'
           image: imageName
           resources: {
-            cpu: json('0.5')
+            cpu: 0.5
             memory: '1Gi'
           }
           volumeMounts: [

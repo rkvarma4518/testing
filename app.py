@@ -18,7 +18,7 @@ def read_csv():
 
         for row in reader:
             rows.append(row)
-            break
+            # break
 
     return jsonify(rows)
 
@@ -43,5 +43,6 @@ def home():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
+
 
 

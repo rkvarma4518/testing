@@ -102,7 +102,7 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2023-05-01'
         name: 'files'
         azureFile: {
           shareName: 'csvshare'          // file share name
-          storageAccountName: 'mystorageaccount'
+          storageAccountName: storageAccountName
           storageAccountKey: storageKey
         }
       }

@@ -103,3 +103,57 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2023-05-01'
     ]
   }
 }
+
+
+
+resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2023-05-01' = {
+  name: containerAppName
+  location: location
+  properties: {
+    osType: 'Linux'
+    restartPolicy: 'Always'
+    diagnostics: {
+      logAnalytics: {
+        workspaceId: logAnalytics.properties.customerId
+        workspaceKey: logAnalytics.listKeys().primarySharedKey
+        logType: 'ContainerInsights'
+      }
+    }
+    containers: [
+      {
+        name: toLower('${containerAppName}-test')
+        properties: {
+          image: imageName
+          resources: {
+            requests: {
+              cpu: 2
+              memoryInGB: 16
+            }
+          }
+          ports: [
+            {
+              port: 8080
+            }
+          ]
+          volumeMounts: [
+            {
+              name: 'files'
+              mountPath: '/mnt/files'
+              readOnly: true
+            }
+          ]
+        }
+      }
+    ]
+    ipAddress: {
+      type: 'Public'
+      ports: [
+        {
+          protocol: 'TCP'
+          port: 8080
+        }
+      ]
+    }
+  }
+}
+

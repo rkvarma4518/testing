@@ -27,7 +27,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
 resource fileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01' = {
   name: '${storageAccount.name}/default/${fileShareName}'
   properties: {
-    shareQuota: 5
+    shareQuota: 12
   }
 }
 

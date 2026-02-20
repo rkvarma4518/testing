@@ -40,20 +40,6 @@ resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
 }
 
 
-/* ---------- ENV STORAGE ---------- */
-
-resource envStorage 'Microsoft.App/managedEnvironments/storages@2023-05-01' = {
-  name: 'csvstorage'
-  parent: containerEnv
-  properties: {
-    azureFile: {
-      accountName: storageAccount.name
-      accountKey: storageKey
-      shareName: fileShareName
-      accessMode: 'ReadWrite'
-    }
-  }
-}
 
 /* ---------- CONTAINER APP ---------- */
 

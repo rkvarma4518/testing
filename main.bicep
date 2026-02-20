@@ -80,7 +80,7 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2023-05-01'
           resources: {
             requests: {
               cpu: 2
-              memoryInGB: 16
+              memoryInGB: 32
             }
           }
           ports: [

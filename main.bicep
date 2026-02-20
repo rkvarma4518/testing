@@ -52,6 +52,9 @@ resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
 resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2023-05-01' = {
   name: containerAppName
   location: location
+  dependsOn: [
+    fileShare
+  ]
   properties: {
     osType: 'Linux'
     restartPolicy: 'Always'
@@ -101,8 +104,8 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2023-05-01'
       {
         name: 'files'
         azureFile: {
-          shareName: 'csvshare'          // file share name
-          storageAccountName: storageAccountName
+          shareName: fileShareName
+          storageAccountName: storageAccount.name
           storageAccountKey: storageKey
         }
       }

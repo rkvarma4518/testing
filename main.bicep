@@ -42,70 +42,6 @@ resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
 
 
 /* ---------- CONTAINER APP ---------- */
-
-resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2023-05-01' = {
-  name: containerAppName
-  location: location
-  properties: {
-    osType: 'Linux'
-    restartPolicy: 'Always'
-    diagnostics: {
-      logAnalytics: {
-        workspaceId: logAnalytics.properties.customerId
-        workspaceKey: logAnalytics.listKeys().primarySharedKey
-        logType: 'ContainerInsights'
-      }
-    }
-    containers: [
-      {
-        name: 'flask'
-        properties: {
-          image: imageName
-          ports: [
-            {
-              port: 8080
-            }
-          ]
-          resources: {
-            requests: {
-              cpu: 0.5
-              memoryInGB: 1
-            }
-          }
-          volumeMounts: [
-            {
-              name: 'files'
-              mountPath: '/mnt/files'
-              readOnly: false
-            }
-          ]
-        }
-      }
-    ]
-    ipAddress: {
-      type: 'Public'
-      ports: [
-        {
-          protocol: 'TCP'
-          port: 8080
-        }
-      ]
-    }
-    volumes: [
-      {
-        name: 'files'
-        azureFile: {
-          shareName: 'csvstorage'          // file share name
-          storageAccountName: 'mystorageaccount'
-          storageAccountKey: storageKey
-        }
-      }
-    ]
-  }
-}
-
-
-
 resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2023-05-01' = {
   name: containerAppName
   location: location
@@ -154,6 +90,16 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2023-05-01'
         }
       ]
     }
+    volumes: [
+      {
+        name: 'files'
+        azureFile: {
+          shareName: 'csvstorage'          // file share name
+          storageAccountName: 'mystorageaccount'
+          storageAccountKey: storageKey
+        }
+      }
+    ]
   }
 }
 

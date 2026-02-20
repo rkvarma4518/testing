@@ -40,29 +40,6 @@ resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
 }
 
 
-/* ---------- CONTAINER APP ENV ---------- */
-
-resource containerEnv 'Microsoft.App/managedEnvironments@2023-05-01' = {
-  name: '${containerAppName}-env'
-  location: location
-  properties: {
-    workloadProfiles: [
-      {
-        name: 'Consumption'
-        workloadProfileType: 'Consumption'
-      }
-    ]
-
-    appLogsConfiguration: {
-      destination: 'log-analytics'
-      logAnalyticsConfiguration: {
-        customerId: logAnalytics.properties.customerId
-        sharedKey: logAnalytics.listKeys().primarySharedKey
-      }
-    }
-  }
-}
-
 /* ---------- ENV STORAGE ---------- */
 
 resource envStorage 'Microsoft.App/managedEnvironments/storages@2023-05-01' = {
@@ -80,48 +57,70 @@ resource envStorage 'Microsoft.App/managedEnvironments/storages@2023-05-01' = {
 
 /* ---------- CONTAINER APP ---------- */
 
-resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
+resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2023-05-01' = {
   name: containerAppName
   location: location
-  dependsOn: [
-    envStorage
-  ]
-  properties: {
-    environmentId: containerEnv.id
 
-    configuration: {
-      ingress: {
-        external: true
-        targetPort: 8080
+  properties: {
+    osType: 'Linux'
+    restartPolicy: 'Always'
+    diagnostics: {
+      logAnalytics: {
+        workspaceId: logAnalytics.properties.customerId
+        workspaceKey: logAnalytics.listKeys().primarySharedKey
+        logType: 'ContainerInsights'
       }
     }
-
-    template: {
-      containers: [
-        {
-          name: 'flask'
+    containers: [
+      {
+        name: 'flask'
+        properties: {
           image: imageName
+
+          ports: [
+            {
+              port: 8080
+            }
+          ]
+
           resources: {
-            cpu: json('0.5')
-            memory: '1Gi'
+            requests: {
+              cpu: 0.5
+              memoryInGB: 1
+            }
           }
+
           volumeMounts: [
             {
-              volumeName: 'files'
+              name: 'files'
               mountPath: '/mnt/files'
+              readOnly: false
             }
           ]
         }
-      ]
+      }
+    ]
 
-      volumes: [
+    ipAddress: {
+      type: 'Public'
+      ports: [
         {
-          name: 'files'
-          storageType: 'AzureFile'
-          storageName: 'csvstorage'
+          protocol: 'TCP'
+          port: 8080
         }
       ]
     }
+
+    volumes: [
+      {
+        name: 'files'
+        azureFile: {
+          shareName: 'csvstorage'          // file share name
+          storageAccountName: 'mystorageaccount'
+          storageAccountKey: storageKey
+        }
+      }
+    ]
   }
 }
 

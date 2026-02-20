@@ -20,7 +20,7 @@ def read_csv():
             rows.append(row)
             # break
 
-    return jsonify(rows)
+    return jsonify({'row count':len(rows)})
 
 
 @app.route("/metrics")
@@ -43,6 +43,7 @@ def home():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
+
 
 
 

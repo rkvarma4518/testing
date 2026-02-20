@@ -46,7 +46,6 @@ resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
 resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2023-05-01' = {
   name: containerAppName
   location: location
-
   properties: {
     osType: 'Linux'
     restartPolicy: 'Always'
@@ -62,20 +61,17 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2023-05-01'
         name: 'flask'
         properties: {
           image: imageName
-
           ports: [
             {
               port: 8080
             }
           ]
-
           resources: {
             requests: {
               cpu: 0.5
               memoryInGB: 1
             }
           }
-
           volumeMounts: [
             {
               name: 'files'
@@ -86,7 +82,6 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2023-05-01'
         }
       }
     ]
-
     ipAddress: {
       type: 'Public'
       ports: [
@@ -96,7 +91,6 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2023-05-01'
         }
       ]
     }
-
     volumes: [
       {
         name: 'files'
@@ -109,7 +103,3 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2023-05-01'
     ]
   }
 }
-
-/* ---------- OUTPUT ---------- */
-
-output appUrl string = containerApp.properties.configuration.ingress.fqdn

@@ -65,6 +65,13 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2023-05-01'
         logType: 'ContainerInsights'
       }
     }
+    imageRegistryCredentials: [
+      {
+        server: 'index.docker.io'
+        username: 'rkvarma4518'
+        password: 'Rahulkumar@4518'
+      }
+    ]
     containers: [
       {
         name: toLower('${containerAppName}-test')
